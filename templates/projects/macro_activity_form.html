@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Macro-activité · Project Pilot{% endblock %}
+{% block content %}
+<a class="small" href="{% url 'projects:detail' project.id %}">← {{ project.name }}</a>
+<h1 class="h2 fw-bold mt-2">{% if activity %}Modifier{% else %}Ajouter{% endif %} une macro-activité</h1>
+<p class="text-secondary">Projet : {{ project.name }}</p>
+<form class="bg-white border rounded-4 p-4 mt-4" method="post">
+  {% include "components/form.html" %}
+  <button class="btn btn-primary" type="submit">Enregistrer</button>
+</form>
+{% endblock %}

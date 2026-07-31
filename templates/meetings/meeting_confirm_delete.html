@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Supprimer {{ meeting.title }} · Project Pilot{% endblock %}
+{% block content %}
+<div class="bg-white border border-danger rounded-4 p-4">
+  <h1 class="h3">Supprimer « {{ meeting.title }} » ?</h1>
+  <p>Les actions associées seront supprimées. Les tâches déjà créées seront conservées.</p>
+  <form method="post">{% csrf_token %}<button class="btn btn-danger">Confirmer</button><a class="btn btn-link" href="{% url 'meetings:detail' meeting.id %}">Annuler</a></form>
+</div>
+{% endblock %}

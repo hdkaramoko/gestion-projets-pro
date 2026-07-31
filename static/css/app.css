@@ -1,0 +1,64 @@
+:root {
+  --pilot-navy: #17233c;
+  --pilot-blue: #315efb;
+  --pilot-bg: #f5f7fb;
+}
+
+body {
+  background: var(--pilot-bg);
+  color: var(--pilot-navy);
+}
+
+.app-shell { min-height: 100vh; }
+.sidebar {
+  background: var(--pilot-navy);
+  color: white;
+  width: 260px;
+}
+.sidebar .nav-link { color: #cbd4e5; border-radius: .6rem; }
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+  background: rgba(255,255,255,.1);
+  color: white;
+}
+.brand-mark {
+  align-items: center;
+  background: var(--pilot-blue);
+  border-radius: .65rem;
+  display: inline-flex;
+  font-weight: 700;
+  height: 2.25rem;
+  justify-content: center;
+  width: 2.25rem;
+}
+.auth-card { max-width: 460px; width: 100%; }
+.content-panel { max-width: 1100px; }
+input:not([type="checkbox"]), select, textarea {
+  border: 1px solid #ced4da;
+  border-radius: .375rem;
+  display: block;
+  min-height: 44px;
+  padding: .5rem .75rem;
+  width: 100%;
+}
+textarea { min-height: 110px; }
+.project-color {
+  border-radius: 50%;
+  display: inline-block;
+  height: .75rem;
+  width: .75rem;
+}
+.calendar-panel { min-height: 650px; }
+.fc .fc-button-primary {
+  background: var(--pilot-navy);
+  border-color: var(--pilot-navy);
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background: var(--pilot-blue);
+  border-color: var(--pilot-blue);
+}
+
+@media (max-width: 991.98px) {
+  .sidebar { width: 100%; }
+  .app-shell { display: block !important; }
+}

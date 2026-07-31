@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Calendrier · Project Pilot{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+  <div>
+    <p class="text-primary fw-semibold mb-1">Planification</p>
+    <h1 class="h2 fw-bold mb-1">Calendrier</h1>
+    <p class="text-secondary">Dates planifiées, échéances et réunions dans une vue unique.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'tasks:create' %}">Nouvelle tâche</a>
+</div>
+
+<div class="d-flex flex-wrap gap-3 small mb-3">
+  <span><i class="project-color me-1" style="background:#315efb"></i> Date planifiée</span>
+  <span><i class="project-color me-1" style="background:#dc3545"></i> Échéance de tâche</span>
+  <span><i class="project-color me-1" style="background:#6f42c1"></i> Réunion</span>
+  <span><i class="project-color me-1" style="background:#fd7e14"></i> Macro-activité</span>
+  <span><i class="project-color me-1" style="background:#212529"></i> Projet</span>
+</div>
+
+<div class="bg-white border rounded-4 p-2 p-md-4 calendar-panel">
+  <div id="calendar"
+       data-events-url="{% url 'calendar:events' %}"
+       data-reschedule-url="{% url 'calendar:reschedule_task' '00000000-0000-0000-0000-000000000000' %}"></div>
+</div>
+<form class="d-none">{% csrf_token %}</form>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.19/locales-all.global.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const calendarElement = document.getElementById("calendar");
+  const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+  const calendar = new FullCalendar.Calendar(calendarElement, {
+    locale: "fr",
+    firstDay: 1,
+    initialView: "dayGridMonth",
+    height: "auto",
+    nowIndicator: true,
+    eventStartEditable: true,
+    eventDurationEditable: false,
+    headerToolbar: {
+      left: "prev,next today",
+      center: "title",
+      right: "dayGridMonth,timeGridWeek,listWeek"
+    },
+    buttonText: {
+      today: "Aujourd'hui",
+      month: "Mois",
+      week: "Semaine",
+      list: "Liste"
+    },
+    events: calendarElement.dataset.eventsUrl,
+    eventDrop: async function (info) {
+      if (info.event.extendedProps.kind !== "task_planned") {
+        info.revert();
+        return;
+      }
+      const plannedDate = info.event.startStr.slice(0, 10);
+      if (!window.confirm("Modifier la date planifiée de cette tâche ?")) {
+        info.revert();
+        return;
+      }
+      const url = calendarElement.dataset.rescheduleUrl.replace(
+        "00000000-0000-0000-0000-000000000000",
+        info.event.extendedProps.taskId
+      );
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+          },
+          body: JSON.stringify({planned_date: plannedDate})
+        });
+        if (!response.ok) {
+          throw new Error("La planification n'a pas pu être enregistrée.");
+        }
+      } catch (error) {
+        info.revert();
+        window.alert(error.message);
+      }
+    }
+  });
+  calendar.render();
+});
+</script>
+{% endblock %}

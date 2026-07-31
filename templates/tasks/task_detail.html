@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ task.title }} · Project Pilot{% endblock %}
+{% block content %}
+<a class="small" href="{% url 'tasks:list' %}">← Toutes les tâches</a>
+<div class="d-flex flex-wrap justify-content-between gap-3 mt-2">
+  <div>
+    <h1 class="h2 fw-bold">{{ task.title }}</h1>
+    <span class="badge text-bg-primary">{{ task.get_status_display }}</span>
+    <span class="badge text-bg-light">{{ task.get_priority_display }}</span>
+    {% if task.is_overdue %}<span class="badge text-bg-danger">En retard</span>{% endif %}
+  </div>
+  <a class="btn btn-outline-primary align-self-start" href="{% url 'tasks:update' task.id %}">Modifier</a>
+</div>
+
+<div class="row g-3 mt-3">
+  <div class="col-lg-8">
+    <section class="bg-white border rounded-4 p-4">
+      <h2 class="h5">Description</h2>
+      <p class="text-secondary">{{ task.description|default:"Aucune description."|linebreaksbr }}</p>
+      {% if task.status == "waiting" %}
+        <hr><h3 class="h6">En attente de</h3>
+        <p>{{ task.waiting_for|default:"Non renseigné" }}</p>
+        <p class="text-secondary">{{ task.waiting_comment|linebreaksbr }}</p>
+      {% endif %}
+    </section>
+    <section class="bg-white border rounded-4 p-4 mt-3">
+      <h2 class="h5">Actions rapides</h2>
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <form method="post" action="{% url 'tasks:status' task.id 'completed' %}">{% csrf_token %}<button class="btn btn-success">Marquer terminée</button></form>
+        <form method="post" action="{% url 'tasks:status' task.id 'in_progress' %}">{% csrf_token %}<button class="btn btn-outline-primary">Passer en cours</button></form>
+        <form method="post" action="{% url 'tasks:status' task.id 'waiting' %}">{% csrf_token %}<button class="btn btn-outline-secondary">Passer en attente</button></form>
+      </div>
+      <div class="row g-3">
+        <form class="col-md-6" method="post" action="{% url 'tasks:reschedule' task.id %}">
+          {% csrf_token %}<label class="form-label">Reporter la date planifiée</label>
+          <div class="d-flex gap-2"><input type="date" name="date" value="{{ task.planned_date|date:'Y-m-d' }}" required><button class="btn btn-outline-primary">Reporter</button></div>
+        </form>
+        <form class="col-md-6" method="post" action="{% url 'tasks:deadline' task.id %}">
+          {% csrf_token %}<label class="form-label">Modifier l'échéance</label>
+          <div class="d-flex gap-2"><input type="date" name="date" value="{{ task.deadline|date:'Y-m-d' }}" required><button class="btn btn-outline-primary">Modifier</button></div>
+        </form>
+      </div>
+    </section>
+  </div>
+  <div class="col-lg-4">
+    <section class="bg-white border rounded-4 p-4">
+      <h2 class="h5">Repères</h2>
+      <dl class="mb-0">
+        <dt>Projet</dt><dd><a href="{% url 'projects:detail' task.project.id %}">{{ task.project.name }}</a></dd>
+        <dt>Macro-activité</dt><dd>{{ task.macro_activity.title|default:"Aucune" }}</dd>
+        <dt>Date planifiée</dt><dd>{{ task.planned_date|date:"d/m/Y"|default:"Non définie" }}</dd>
+        <dt>Échéance</dt><dd>{{ task.deadline|date:"d/m/Y"|default:"Non définie" }}</dd>
+        <dt>Charge</dt><dd>{% if task.estimated_load %}{{ task.estimated_load }} min{% else %}Non définie{% endif %}</dd>
+        <dt>Origine</dt><dd>{{ task.get_origin_display }}</dd>
+        {% if task.completed_at %}<dt>Réalisée le</dt><dd>{{ task.completed_at|date:"d/m/Y H:i" }}</dd>{% endif %}
+      </dl>
+    </section>
+  </div>
+</div>
+<div class="border-top mt-5 pt-3"><a class="text-danger" href="{% url 'tasks:delete' task.id %}">Supprimer cette tâche</a></div>
+{% endblock %}

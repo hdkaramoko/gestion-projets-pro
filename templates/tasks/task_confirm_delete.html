@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Supprimer {{ task.title }} · Project Pilot{% endblock %}
+{% block content %}
+<div class="bg-white border border-danger rounded-4 p-4">
+  <h1 class="h3">Supprimer « {{ task.title }} » ?</h1>
+  <p>Cette action est définitive.</p>
+  <form method="post">{% csrf_token %}
+    <button class="btn btn-danger">Confirmer la suppression</button>
+    <a class="btn btn-link" href="{% url 'tasks:detail' task.id %}">Annuler</a>
+  </form>
+</div>
+{% endblock %}

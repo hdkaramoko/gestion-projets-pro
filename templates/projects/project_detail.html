@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }} · Project Pilot{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between gap-3">
+  <div>
+    <a class="small" href="{% url 'projects:list' %}">← Tous les projets</a>
+    <h1 class="h2 fw-bold mt-2">
+      <span class="project-color me-2" style="background:{{ project.color }}"></span>{{ project.name }}
+    </h1>
+    <span class="badge text-bg-primary">{{ project.get_status_display }}</span>
+    <span class="badge text-bg-light">{{ project.get_priority_display }}</span>
+  </div>
+  <div class="d-flex align-items-start gap-2">
+    <a class="btn btn-outline-primary" href="{% url 'projects:update' project.id %}">Modifier</a>
+    {% if project.status == "archived" %}
+      <form method="post" action="{% url 'projects:reactivate' project.id %}">{% csrf_token %}
+        <button class="btn btn-success">Réactiver</button>
+      </form>
+    {% else %}
+      <form method="post" action="{% url 'projects:archive' project.id %}">{% csrf_token %}
+        <button class="btn btn-outline-secondary">Archiver</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-3 mt-3">
+  <div class="col-lg-8">
+    <section class="bg-white border rounded-4 p-4">
+      <h2 class="h5">Vue d'ensemble</h2>
+      <p class="text-secondary">{{ project.description|default:"Aucune description."|linebreaksbr }}</p>
+      {% if project.notes %}<hr><h3 class="h6">Contexte et notes</h3><p>{{ project.notes|linebreaksbr }}</p>{% endif %}
+    </section>
+  </div>
+  <div class="col-lg-4">
+    <section class="bg-white border rounded-4 p-4">
+      <h2 class="h5">Repères</h2>
+      <dl class="mb-0">
+        <dt>Début</dt><dd>{{ project.start_date|date:"d/m/Y"|default:"Non défini" }}</dd>
+        <dt>Échéance</dt><dd>{{ project.deadline|date:"d/m/Y"|default:"Non définie" }}</dd>
+        <dt>Charge estimée</dt><dd>{% if project.estimated_load %}{{ project.estimated_load }} min{% else %}Non définie{% endif %}</dd>
+        <dt>Progression</dt><dd>{{ project.progress }} %</dd>
+      </dl>
+    </section>
+  </div>
+</div>
+
+<section class="mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h4 mb-0">Macro-activités</h2>
+      <p class="small text-secondary mb-0">Sans tâche active, une macro-activité représente elle-même une prochaine action.</p>
+    </div>
+    {% if project.status != "archived" %}
+      <a class="btn btn-primary" href="{% url 'projects:activity_create' project.id %}">Ajouter</a>
+    {% endif %}
+  </div>
+  {% for activity in project.macro_activities.all %}
+    <article class="bg-white border rounded-3 p-3 mb-2 d-flex justify-content-between gap-3">
+      <div>
+        <h3 class="h6 mb-1">{{ activity.title }}</h3>
+        <span class="badge text-bg-light">{{ activity.get_status_display }}</span>
+        {% if activity.is_actionable %}<span class="badge text-bg-info">Actionnable</span>{% endif %}
+        {% if activity.deadline %}<span class="small text-secondary ms-2">Échéance {{ activity.deadline|date:"d/m/Y" }}</span>{% endif %}
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'projects:activity_update' activity.id %}">Modifier</a>
+        <form method="post" action="{% url 'projects:activity_delete' activity.id %}" onsubmit="return confirm('Supprimer cette macro-activité ?')">
+          {% csrf_token %}<button class="btn btn-sm btn-outline-danger">Supprimer</button>
+        </form>
+      </div>
+    </article>
+  {% empty %}
+    <div class="bg-white border rounded-4 p-4 text-center text-secondary">Aucune macro-activité pour le moment.</div>
+  {% endfor %}
+</section>
+
+<section class="mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">Tâches</h2>
+    {% if project.status != "archived" %}
+      <a class="btn btn-primary" href="{% url 'tasks:create' %}?project={{ project.id }}">Ajouter une tâche</a>
+    {% endif %}
+  </div>
+  {% for task in project.tasks.all %}
+    {% include "tasks/components/task_row.html" %}
+  {% empty %}
+    <div class="bg-white border rounded-4 p-4 text-center text-secondary">Aucune tâche pour le moment.</div>
+  {% endfor %}
+</section>
+
+<section class="mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">Réunions</h2>
+    {% if project.status != "archived" %}
+      <a class="btn btn-primary" href="{% url 'meetings:create' %}?project={{ project.id }}">Ajouter une réunion</a>
+    {% endif %}
+  </div>
+  {% for meeting in project.meetings.all %}
+    <a class="d-block bg-white border rounded-3 p-3 mb-2 text-decoration-none text-reset" href="{% url 'meetings:detail' meeting.id %}">
+      <div class="d-flex justify-content-between gap-3"><strong>{{ meeting.title }}</strong><span class="text-secondary">{{ meeting.scheduled_at|date:"d/m/Y H:i" }}</span></div>
+    </a>
+  {% empty %}
+    <div class="bg-white border rounded-4 p-4 text-center text-secondary">Aucune réunion pour le moment.</div>
+  {% endfor %}
+</section>
+
+<div class="border-top mt-5 pt-3">
+  <a class="text-danger" href="{% url 'projects:delete' project.id %}">Supprimer définitivement ce projet</a>
+</div>
+{% endblock %}

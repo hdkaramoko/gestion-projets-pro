@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Archives de la boîte de réception · Project Pilot{% endblock %}
+{% block content %}
+<a class="small" href="{% url 'inbox:list' %}">← Boîte de réception</a>
+<h1 class="h2 fw-bold mt-2">Éléments archivés</h1>
+{% for item in items %}
+  <article class="bg-white border rounded-3 p-3 mt-3 d-flex justify-content-between gap-3">
+    <div><strong>{{ item.content }}</strong><div class="small text-secondary">Archivé le {{ item.processed_at|date:"d/m/Y H:i" }}</div></div>
+    <form method="post" action="{% url 'inbox:delete' item.id %}" onsubmit="return confirm('Supprimer définitivement cet élément ?')">
+      {% csrf_token %}<button class="btn btn-sm btn-outline-danger">Supprimer</button>
+    </form>
+  </article>
+{% empty %}
+  <div class="bg-white border rounded-4 p-4 mt-4 text-secondary">Aucun élément archivé.</div>
+{% endfor %}
+{% endblock %}

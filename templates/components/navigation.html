@@ -1,0 +1,22 @@
+<aside class="sidebar p-3 p-lg-4 d-flex flex-column">
+  <a class="text-white text-decoration-none d-flex align-items-center gap-2 mb-4" href="{% url 'home' %}">
+    <span class="brand-mark">P</span><strong>Project Pilot</strong>
+  </a>
+  <nav class="nav nav-pills flex-column gap-1 flex-grow-1">
+    <a class="nav-link active" href="{% url 'home' %}">Aujourd'hui</a>
+    <a class="nav-link" href="{% url 'inbox:list' %}">Boîte de réception</a>
+    <a class="nav-link" href="{% url 'projects:list' %}">Projets</a>
+    <a class="nav-link" href="{% url 'tasks:list' %}">Tâches</a>
+    <a class="nav-link" href="{% url 'calendar:view' %}">Calendrier</a>
+    <a class="nav-link" href="{% url 'meetings:list' %}">Réunions</a>
+    <a class="nav-link" href="{% url 'home' %}#statistiques">Statistiques</a>
+    <a class="nav-link" href="{% url 'accounts:profile' %}">Paramètres</a>
+  </nav>
+  <div class="border-top border-secondary pt-3 mt-4">
+    <div class="small text-white-50 text-truncate mb-2">{{ user.email }}</div>
+    <form method="post" action="{% url 'accounts:logout' %}">
+      {% csrf_token %}
+      <button class="btn btn-outline-light btn-sm w-100" type="submit">Se déconnecter</button>
+    </form>
+  </div>
+</aside>

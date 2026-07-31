@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Mon profil · Project Pilot{% endblock %}
+{% block content %}
+<h1 class="h2 fw-bold">Paramètres du compte</h1>
+<div class="bg-white border rounded-4 p-4 mt-4">
+  <form method="post">
+    {% include "components/form.html" %}
+    <button class="btn btn-primary" type="submit">Enregistrer</button>
+    <a class="btn btn-link" href="{% url 'accounts:password_change' %}">Modifier mon mot de passe</a>
+  </form>
+</div>
+{% endblock %}

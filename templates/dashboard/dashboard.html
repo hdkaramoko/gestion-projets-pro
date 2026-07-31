@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Aujourd'hui · Project Pilot{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+  <div>
+    <p class="text-primary fw-semibold mb-1">Bonjour {{ user.first_name|default:user.email }}</p>
+    <h1 class="display-6 fw-bold mb-1">Votre journée en un coup d'œil</h1>
+    <p class="text-secondary">Les actions urgentes et les échéances à anticiper.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary" href="{% url 'inbox:list' %}">Capturer une idée</a>
+    <a class="btn btn-primary" href="{% url 'tasks:create' %}">Nouvelle tâche</a>
+  </div>
+</div>
+
+<section id="statistiques" class="row g-3 my-3">
+  <div class="col-6 col-lg-3"><div class="bg-white border rounded-4 p-3 h-100"><div class="small text-secondary">En retard</div><div class="h3 mb-0 text-danger">{{ statistics.overdue_count }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="bg-white border rounded-4 p-3 h-100"><div class="small text-secondary">Aujourd'hui</div><div class="h3 mb-0">{{ statistics.today_count }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="bg-white border rounded-4 p-3 h-100"><div class="small text-secondary">Cette semaine</div><div class="h3 mb-0">{{ statistics.week_count }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="bg-white border rounded-4 p-3 h-100"><div class="small text-secondary">Charge semaine</div><div class="h3 mb-0">{{ statistics.week_load }} <small class="fs-6">min</small></div></div></div>
+</section>
+
+<div class="row g-4">
+  <div class="col-xl-8">
+    <section class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h4 mb-0">À faire aujourd'hui</h2>
+        <span class="badge text-bg-primary">{{ statistics.today_count }}</span>
+      </div>
+      {% for task in today_tasks %}
+        {% include "tasks/components/task_row.html" %}
+      {% empty %}
+        <div class="bg-white border rounded-4 p-4 text-center text-secondary">Aucune tâche planifiée ou due aujourd'hui.</div>
+      {% endfor %}
+    </section>
+
+    <section class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h4 mb-0">Actions en retard</h2>
+        <a class="small" href="{% url 'tasks:list' %}?overdue=1">Voir les tâches</a>
+      </div>
+      {% for task in overdue_tasks %}
+        {% include "tasks/components/task_row.html" %}
+      {% endfor %}
+      {% for activity in overdue_activities %}
+        <article class="bg-white border border-danger rounded-3 p-3 mb-2">
+          <div class="d-flex justify-content-between gap-3">
+            <div><strong>{{ activity.title }}</strong><div class="small text-secondary">{{ activity.project.name }} · Macro-activité actionnable</div></div>
+            <div class="text-danger">Échéance {{ activity.deadline|date:"d/m/Y" }}</div>
+          </div>
+        </article>
+      {% endfor %}
+      {% if not overdue_tasks and not overdue_activities %}
+        <div class="bg-white border rounded-4 p-4 text-center text-secondary">Aucune action en retard.</div>
+      {% endif %}
+    </section>
+
+    <section class="mb-4">
+      <h2 class="h4">Cette semaine</h2>
+      <p class="small text-secondary">Du {{ statistics.week_start|date:"d/m" }} au {{ statistics.week_end|date:"d/m/Y" }}</p>
+      {% for task in week_tasks %}
+        {% include "tasks/components/task_row.html" %}
+      {% endfor %}
+      {% for activity in week_activities %}
+        <a class="d-block bg-white border rounded-3 p-3 mb-2 text-decoration-none text-reset" href="{% url 'projects:detail' activity.project.id %}">
+          <strong>{{ activity.title }}</strong>
+          <span class="badge text-bg-info ms-2">Macro-activité actionnable</span>
+          <div class="small text-secondary">{{ activity.project.name }} · Échéance {{ activity.deadline|date:"d/m/Y" }}</div>
+        </a>
+      {% endfor %}
+      {% if not week_tasks and not week_activities %}
+        <div class="bg-white border rounded-4 p-4 text-center text-secondary">Aucune action prévue cette semaine.</div>
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="col-xl-4">
+    <section class="bg-white border rounded-4 p-4 mb-3">
+      <div class="d-flex justify-content-between"><h2 class="h5">En attente</h2><span class="badge text-bg-secondary">{{ statistics.waiting_count }}</span></div>
+      {% for task in waiting_tasks %}
+        <div class="border-top pt-2 mt-2">
+          <a class="fw-semibold text-decoration-none" href="{% url 'tasks:detail' task.id %}">{{ task.title }}</a>
+          <div class="small text-secondary">{{ task.waiting_for|default:"Responsable non renseigné" }} · depuis {{ task.created_at|timesince }}</div>
+        </div>
+      {% empty %}
+        <p class="text-secondary small mb-0">Aucune tâche en attente.</p>
+      {% endfor %}
+    </section>
+
+    <section class="bg-white border rounded-4 p-4 mb-3">
+      <h2 class="h5">Prochaines échéances</h2>
+      {% for item in upcoming_deadlines|slice:":10" %}
+        <div class="border-top pt-2 mt-2">
+          {% if item.kind == "task" %}
+            <a class="small fw-semibold" href="{% url 'tasks:detail' item.object.id %}">{{ item.object.title }}</a><div class="small text-secondary">Tâche · {{ item.deadline|date:"d/m/Y" }}</div>
+          {% elif item.kind == "activity" %}
+            <a class="small fw-semibold" href="{% url 'projects:detail' item.object.project.id %}">{{ item.object.title }}</a><div class="small text-secondary">Macro-activité · {{ item.deadline|date:"d/m/Y" }}</div>
+          {% else %}
+            <a class="small fw-semibold" href="{% url 'projects:detail' item.object.id %}">{{ item.object.name }}</a><div class="small text-secondary">Projet · {{ item.deadline|date:"d/m/Y" }}</div>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p class="text-secondary small mb-0">Aucune échéance future.</p>
+      {% endfor %}
+    </section>
+
+    <section class="bg-white border border-warning rounded-4 p-4 mb-3">
+      <div class="d-flex justify-content-between"><h2 class="h5">Projets sans prochaine action</h2><span class="badge text-bg-warning">{{ statistics.projects_without_action_count }}</span></div>
+      {% for project in projects_without_action %}
+        <div class="border-top pt-2 mt-2"><a class="fw-semibold text-decoration-none" href="{% url 'projects:detail' project.id %}">{{ project.name }}</a><div class="small text-secondary">Ajoutez une tâche ou une macro-activité.</div></div>
+      {% empty %}
+        <p class="text-secondary small mb-0">Tous les projets actifs ont une prochaine action.</p>
+      {% endfor %}
+    </section>
+  </div>
+</div>
+
+<section class="bg-white border rounded-4 p-4 mt-2">
+  <h2 class="h4">Indicateurs de suivi</h2>
+  <div class="row g-3 mt-1">
+    <div class="col-6 col-lg"><div class="small text-secondary">Terminées sur 7 jours</div><strong class="h4">{{ statistics.completed_last_7_days }}</strong></div>
+    <div class="col-6 col-lg"><div class="small text-secondary">Terminées dans les délais</div><strong class="h4">{{ statistics.on_time_rate }} %</strong></div>
+    <div class="col-6 col-lg"><div class="small text-secondary">En attente</div><strong class="h4">{{ statistics.waiting_count }}</strong></div>
+    <div class="col-6 col-lg"><div class="small text-secondary">Projets sans action</div><strong class="h4">{{ statistics.projects_without_action_count }}</strong></div>
+  </div>
+</section>
+{% endblock %}

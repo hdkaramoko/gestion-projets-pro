@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ meeting.title }} · Project Pilot{% endblock %}
+{% block content %}
+<a class="small" href="{% url 'meetings:list' %}">← Toutes les réunions</a>
+<div class="d-flex flex-wrap justify-content-between gap-3 mt-2">
+  <div><h1 class="h2 fw-bold mb-1">{{ meeting.title }}</h1><p class="text-secondary">{{ meeting.scheduled_at|date:"d/m/Y à H:i" }} · <a href="{% url 'projects:detail' meeting.project.id %}">{{ meeting.project.name }}</a></p></div>
+  <div class="d-flex gap-2 align-items-start">
+    <a class="btn btn-outline-secondary" href="{% url 'meetings:print' meeting.id %}">Vue imprimable</a>
+    <a class="btn btn-outline-primary" href="{% url 'meetings:update' meeting.id %}">Modifier</a>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-8">
+    <section class="bg-white border rounded-4 p-4">
+      <h2 class="h5">Contexte</h2><p>{{ meeting.context|default:"Non renseigné"|linebreaksbr }}</p>
+      <hr><h2 class="h5">Points discutés</h2><p>{{ meeting.discussion_points|default:"Non renseignés"|linebreaksbr }}</p>
+      <hr><h2 class="h5">Décisions prises</h2><p>{{ meeting.decisions|default:"Non renseignées"|linebreaksbr }}</p>
+      <hr><h2 class="h5">Prochaines étapes</h2><p>{{ meeting.next_steps|default:"Non renseignées"|linebreaksbr }}</p>
+      {% if meeting.notes %}<hr><h2 class="h5">Notes complémentaires</h2><p>{{ meeting.notes|linebreaksbr }}</p>{% endif %}
+    </section>
+  </div>
+  <div class="col-lg-4">
+    <section class="bg-white border rounded-4 p-4"><h2 class="h5">Participants</h2><p class="mb-0">{{ meeting.participants|default:"Non renseignés"|linebreaksbr }}</p></section>
+  </div>
+</div>
+<section class="mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h4 mb-0">Actions décidées</h2><a class="btn btn-primary" href="{% url 'meetings:action_create' meeting.id %}">Ajouter une action</a></div>
+  {% for action in meeting.actions.all %}
+    <article class="bg-white border rounded-3 p-3 mb-2 d-flex flex-wrap justify-content-between gap-3">
+      <div>
+        <h3 class="h6 mb-1">{{ action.title }}</h3>
+        {% if action.assignee %}<span class="small text-secondary">Responsable : {{ action.assignee }}</span>{% endif %}
+        {% if action.deadline %}<span class="small text-secondary ms-2">Échéance {{ action.deadline|date:"d/m/Y" }}</span>{% endif %}
+        {% if action.created_task %}<div><a class="small" href="{% url 'tasks:detail' action.created_task.id %}">Voir la tâche créée</a></div>{% endif %}
+      </div>
+      <div class="d-flex gap-1">
+        {% if not action.created_task %}<form method="post" action="{% url 'meetings:action_convert' action.id %}">{% csrf_token %}<button class="btn btn-sm btn-success">Créer la tâche</button></form>{% endif %}
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'meetings:action_update' action.id %}">Modifier</a>
+        <form method="post" action="{% url 'meetings:action_delete' action.id %}" onsubmit="return confirm('Supprimer cette action ?')">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">Supprimer</button></form>
+      </div>
+    </article>
+  {% empty %}
+    <div class="bg-white border rounded-4 p-4 text-center text-secondary">Aucune action décidée.</div>
+  {% endfor %}
+</section>
+<div class="border-top mt-5 pt-3"><a class="text-danger" href="{% url 'meetings:delete' meeting.id %}">Supprimer cette réunion</a></div>
+{% endblock %}

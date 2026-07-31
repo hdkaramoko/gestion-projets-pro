@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Connexion · Project Pilot{% endblock %}
+{% block auth_content %}
+<div class="bg-white border rounded-4 shadow-sm p-4 p-md-5">
+  <div class="brand-mark text-white mb-4">P</div>
+  <h1 class="h3 fw-bold">Bon retour</h1>
+  <p class="text-secondary">Connectez-vous à votre espace de pilotage.</p>
+  <form method="post">
+    {% include "components/form.html" %}
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    <button class="btn btn-primary w-100" type="submit">Se connecter</button>
+  </form>
+  <div class="d-flex justify-content-between mt-3 small">
+    <a href="{% url 'accounts:signup' %}">Créer un compte</a>
+    <a href="{% url 'accounts:password_reset' %}">Mot de passe oublié ?</a>
+  </div>
+</div>
+{% endblock %}

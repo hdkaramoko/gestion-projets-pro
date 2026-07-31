@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Qualifier un élément · Project Pilot{% endblock %}
+{% block content %}
+<a class="small" href="{% url 'inbox:list' %}">← Boîte de réception</a>
+<h1 class="h2 fw-bold mt-2">Transformer en tâche</h1>
+<div class="alert alert-light border mt-3"><strong>Capture :</strong> {{ item.content }}</div>
+<form class="bg-white border rounded-4 p-4 mt-3" method="post">
+  {% include "components/form.html" %}
+  <button class="btn btn-primary" type="submit">Créer la tâche</button>
+</form>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Boîte de réception · Project Pilot{% endblock %}
+{% block content %}
+<div>
+  <p class="text-primary fw-semibold mb-1">Capture rapide</p>
+  <h1 class="h2 fw-bold">Boîte de réception</h1>
+  <p class="text-secondary">Notez d'abord, qualifiez ensuite.</p>
+</div>
+
+<form class="bg-white border rounded-4 p-3 my-4" method="post">
+  {% csrf_token %}
+  <div class="d-flex flex-column flex-md-row gap-2">
+    <div class="flex-grow-1">
+      {{ form.content }}
+      {% for error in form.content.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+    </div>
+    <button class="btn btn-primary px-4" type="submit">Capturer</button>
+  </div>
+</form>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <form method="get">
+    <select name="status" onchange="this.form.submit()" aria-label="Filtrer par statut">
+      <option value="">Tous les éléments</option>
+      <option value="to_process" {% if selected_status == "to_process" %}selected{% endif %}>À qualifier</option>
+      <option value="converted" {% if selected_status == "converted" %}selected{% endif %}>Transformés</option>
+      <option value="ignored" {% if selected_status == "ignored" %}selected{% endif %}>Ignorés</option>
+    </select>
+  </form>
+  <a class="small" href="{% url 'inbox:archive_list' %}">Voir les archives</a>
+</div>
+
+{% for item in items %}
+  <article class="bg-white border rounded-3 p-3 mb-2 d-flex flex-wrap justify-content-between gap-3">
+    <div>
+      <h2 class="h6 mb-1">{{ item.content }}</h2>
+      <span class="badge text-bg-light">{{ item.get_status_display }}</span>
+      <span class="small text-secondary ms-2">{{ item.created_at|date:"d/m/Y H:i" }}</span>
+      {% if item.converted_task %}
+        <a class="small ms-2" href="{% url 'tasks:detail' item.converted_task.id %}">Voir la tâche créée</a>
+      {% endif %}
+    </div>
+    <div class="d-flex flex-wrap gap-1">
+      {% if item.status == "to_process" %}
+        <a class="btn btn-sm btn-primary" href="{% url 'inbox:convert' item.id %}">Transformer</a>
+        <form method="post" action="{% url 'inbox:ignore' item.id %}">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary">Ignorer</button></form>
+      {% endif %}
+      <form method="post" action="{% url 'inbox:archive' item.id %}">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary">Archiver</button></form>
+      <form method="post" action="{% url 'inbox:delete' item.id %}" onsubmit="return confirm('Supprimer cet élément ?')">
+        {% csrf_token %}<button class="btn btn-sm btn-outline-danger">Supprimer</button>
+      </form>
+    </div>
+  </article>
+{% empty %}
+  <div class="bg-white border rounded-4 p-5 text-center">
+    <h2 class="h5">Votre boîte de réception est vide</h2>
+    <p class="text-secondary mb-0">Capturez une idée dès qu'elle apparaît.</p>
+  </div>
+{% endfor %}
+{% endblock %}

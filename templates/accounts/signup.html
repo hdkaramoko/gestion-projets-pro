@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Inscription · Project Pilot{% endblock %}
+{% block auth_content %}
+<div class="bg-white border rounded-4 shadow-sm p-4 p-md-5">
+  <h1 class="h3 fw-bold">Créer votre compte</h1>
+  <p class="text-secondary">Commencez à organiser votre travail.</p>
+  <form method="post">
+    {% include "components/form.html" %}
+    <button class="btn btn-primary w-100" type="submit">Créer mon compte</button>
+  </form>
+  <p class="small text-center mt-3 mb-0">Déjà inscrit ? <a href="{% url 'accounts:login' %}">Se connecter</a></p>
+</div>
+{% endblock %}

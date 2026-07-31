@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Projets archivés · Project Pilot{% endblock %}
+{% block content %}
+<a class="small" href="{% url 'projects:list' %}">← Projets actifs</a>
+<h1 class="h2 fw-bold mt-2">Projets archivés</h1>
+{% for project in projects %}
+  <a class="d-block bg-white border rounded-3 p-3 mt-3 text-decoration-none text-reset" href="{% url 'projects:detail' project.id %}">
+    <strong>{{ project.name }}</strong>
+    <span class="text-secondary small ms-2">Archivé le {{ project.archived_at|date:"d/m/Y" }}</span>
+  </a>
+{% empty %}
+  <div class="bg-white border rounded-4 p-4 mt-4 text-secondary">Aucun projet archivé.</div>
+{% endfor %}
+{% endblock %}

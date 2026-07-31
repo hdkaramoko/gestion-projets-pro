@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Supprimer {{ project.name }} · Project Pilot{% endblock %}
+{% block content %}
+<div class="bg-white border border-danger rounded-4 p-4">
+  <h1 class="h3">Supprimer « {{ project.name }} » ?</h1>
+  <p>Cette action supprimera également ses macro-activités et ne peut pas être annulée.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Confirmer la suppression</button>
+    <a class="btn btn-link" href="{% url 'projects:detail' project.id %}">Annuler</a>
+  </form>
+</div>
+{% endblock %}

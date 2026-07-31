@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Projets · Project Pilot{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+  <div>
+    <p class="text-primary fw-semibold mb-1">Pilotage</p>
+    <h1 class="h2 fw-bold mb-0">Mes projets</h1>
+  </div>
+  <a class="btn btn-primary" href="{% url 'projects:create' %}">Nouveau projet</a>
+</div>
+
+<form class="row g-2 my-4" method="get">
+  <div class="col-md-7">
+    <input name="q" value="{{ query }}" placeholder="Rechercher un projet…" aria-label="Rechercher">
+  </div>
+  <div class="col-md-3">
+    <select name="status" aria-label="Filtrer par statut">
+      <option value="">Tous les statuts</option>
+      <option value="upcoming" {% if selected_status == "upcoming" %}selected{% endif %}>À venir</option>
+      <option value="active" {% if selected_status == "active" %}selected{% endif %}>Actif</option>
+      <option value="paused" {% if selected_status == "paused" %}selected{% endif %}>En pause</option>
+      <option value="completed" {% if selected_status == "completed" %}selected{% endif %}>Terminé</option>
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-outline-primary h-100 w-100">Filtrer</button></div>
+</form>
+
+{% if projects %}
+  <div class="row g-3">
+    {% for project in projects %}
+      <div class="col-md-6">
+        <a class="card h-100 border-0 shadow-sm text-decoration-none text-reset" href="{% url 'projects:detail' project.id %}">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between gap-3">
+              <h2 class="h5 mb-1">
+                <span class="project-color me-2" style="background:{{ project.color }}"></span>{{ project.name }}
+              </h2>
+              <span class="badge text-bg-light">{{ project.get_status_display }}</span>
+            </div>
+            <p class="text-secondary small mt-2">{{ project.description|default:"Aucune description"|truncatechars:120 }}</p>
+            <div class="d-flex justify-content-between small">
+              <span>{{ project.get_priority_display }}</span>
+              <span>{% if project.deadline %}Échéance {{ project.deadline|date:"d/m/Y" }}{% else %}Sans échéance{% endif %}</span>
+            </div>
+            <div class="progress mt-3" role="progressbar" aria-label="Progression" aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100">
+              <div class="progress-bar" style="width:{{ project.progress }}%"></div>
+            </div>
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="bg-white border rounded-4 p-5 text-center">
+    <h2 class="h5">Aucun projet à afficher</h2>
+    <p class="text-secondary">Créez votre premier projet ou modifiez vos filtres.</p>
+    <a class="btn btn-primary" href="{% url 'projects:create' %}">Créer un projet</a>
+  </div>
+{% endif %}
+<a class="d-inline-block mt-4" href="{% url 'projects:archive_list' %}">Consulter les projets archivés</a>
+{% endblock %}

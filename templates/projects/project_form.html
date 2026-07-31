@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{% if project %}Modifier{% else %}Nouveau projet{% endif %} · Project Pilot{% endblock %}
+{% block content %}
+<a class="small" href="{% if project %}{% url 'projects:detail' project.id %}{% else %}{% url 'projects:list' %}{% endif %}">← Annuler</a>
+<h1 class="h2 fw-bold mt-2">{% if project %}Modifier le projet{% else %}Créer un projet{% endif %}</h1>
+<form class="bg-white border rounded-4 p-4 mt-4" method="post">
+  {% include "components/form.html" %}
+  <button class="btn btn-primary" type="submit">Enregistrer</button>
+</form>
+{% endblock %}

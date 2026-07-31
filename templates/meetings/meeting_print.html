@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>{{ meeting.title }}</title>
+  <style>
+    body { color: #17233c; font: 16px/1.5 system-ui, sans-serif; margin: 40px auto; max-width: 850px; padding: 0 24px; }
+    h1 { margin-bottom: 0; } h2 { border-bottom: 1px solid #ccd2dc; margin-top: 32px; padding-bottom: 6px; }
+    .meta { color: #5f6878; } .action { border: 1px solid #ccd2dc; margin: 10px 0; padding: 12px; }
+    @media print { .no-print { display: none; } body { margin: 0; max-width: none; } }
+  </style>
+</head>
+<body>
+  <button class="no-print" onclick="window.print()">Imprimer</button>
+  <h1>{{ meeting.title }}</h1>
+  <p class="meta">{{ meeting.project.name }} · {{ meeting.scheduled_at|date:"d/m/Y à H:i" }}</p>
+  <h2>Participants</h2><p>{{ meeting.participants|default:"Non renseignés"|linebreaksbr }}</p>
+  <h2>Contexte</h2><p>{{ meeting.context|default:"Non renseigné"|linebreaksbr }}</p>
+  <h2>Points discutés</h2><p>{{ meeting.discussion_points|default:"Non renseignés"|linebreaksbr }}</p>
+  <h2>Décisions prises</h2><p>{{ meeting.decisions|default:"Non renseignées"|linebreaksbr }}</p>
+  <h2>Prochaines étapes</h2><p>{{ meeting.next_steps|default:"Non renseignées"|linebreaksbr }}</p>
+  {% if meeting.notes %}<h2>Notes complémentaires</h2><p>{{ meeting.notes|linebreaksbr }}</p>{% endif %}
+  <h2>Actions décidées</h2>
+  {% for action in meeting.actions.all %}<div class="action"><strong>{{ action.title }}</strong>{% if action.assignee %} — {{ action.assignee }}{% endif %}{% if action.deadline %}<br>Échéance : {{ action.deadline|date:"d/m/Y" }}{% endif %}<br>{{ action.description|linebreaksbr }}</div>{% empty %}<p>Aucune action.</p>{% endfor %}
+</body>
+</html>

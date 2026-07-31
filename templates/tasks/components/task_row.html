@@ -1,0 +1,28 @@
+<article class="bg-white border rounded-3 p-3 mb-2">
+  <div class="d-flex flex-wrap justify-content-between gap-3">
+    <div class="flex-grow-1">
+      <div class="d-flex align-items-center gap-2">
+        <a class="fw-semibold text-decoration-none text-reset" href="{% url 'tasks:detail' task.id %}">{{ task.title }}</a>
+        <span class="badge text-bg-light">{{ task.get_status_display }}</span>
+        {% if task.is_overdue %}<span class="badge text-bg-danger">En retard</span>{% endif %}
+      </div>
+      <div class="small text-secondary mt-1">
+        {{ task.project.name }}
+        {% if task.macro_activity %} · {{ task.macro_activity.title }}{% endif %}
+        {% if task.planned_date %} · Planifiée {{ task.planned_date|date:"d/m/Y" }}{% endif %}
+        {% if task.deadline %} · Échéance {{ task.deadline|date:"d/m/Y" }}{% endif %}
+      </div>
+    </div>
+    <div class="d-flex gap-1">
+      {% if task.status != "completed" %}
+        <form method="post" action="{% url 'tasks:status' task.id 'completed' %}">{% csrf_token %}<button class="btn btn-sm btn-success">Terminer</button></form>
+      {% endif %}
+      {% if task.status != "in_progress" %}
+        <form method="post" action="{% url 'tasks:status' task.id 'in_progress' %}">{% csrf_token %}<button class="btn btn-sm btn-outline-primary">Démarrer</button></form>
+      {% endif %}
+      {% if task.status != "waiting" %}
+        <form method="post" action="{% url 'tasks:status' task.id 'waiting' %}">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary">Attendre</button></form>
+      {% endif %}
+    </div>
+  </div>
+</article>

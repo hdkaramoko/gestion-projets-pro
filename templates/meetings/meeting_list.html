@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Réunions · Project Pilot{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+  <div><p class="text-primary fw-semibold mb-1">Comptes rendus</p><h1 class="h2 fw-bold mb-0">Réunions</h1></div>
+  <a class="btn btn-primary" href="{% url 'meetings:create' %}">Nouvelle réunion</a>
+</div>
+<form class="row g-2 my-4" method="get">
+  <div class="col-md-7"><input name="q" value="{{ query }}" placeholder="Titre, participant ou projet…" aria-label="Rechercher"></div>
+  <div class="col-md-3">
+    <select name="project" aria-label="Projet">
+      <option value="">Tous les projets</option>
+      {% for project in projects %}<option value="{{ project.id }}" {% if selected_project == project.id|stringformat:"s" %}selected{% endif %}>{{ project.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-outline-primary h-100 w-100">Filtrer</button></div>
+</form>
+{% for meeting in meetings %}
+  <a class="d-block bg-white border rounded-3 p-3 mb-2 text-decoration-none text-reset" href="{% url 'meetings:detail' meeting.id %}">
+    <div class="d-flex justify-content-between gap-3">
+      <div><h2 class="h6 mb-1">{{ meeting.title }}</h2><span class="small text-secondary">{{ meeting.project.name }}</span></div>
+      <div class="text-end"><strong>{{ meeting.scheduled_at|date:"d/m/Y" }}</strong><div class="small text-secondary">{{ meeting.scheduled_at|date:"H:i" }}</div></div>
+    </div>
+  </a>
+{% empty %}
+  <div class="bg-white border rounded-4 p-5 text-center">
+    <h2 class="h5">Aucune réunion à afficher</h2>
+    <p class="text-secondary">Créez un premier compte rendu.</p>
+    <a class="btn btn-primary" href="{% url 'meetings:create' %}">Créer une réunion</a>
+  </div>
+{% endfor %}
+{% endblock %}

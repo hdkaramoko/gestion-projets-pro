@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{% if meeting %}Modifier{% else %}Nouvelle réunion{% endif %} · Project Pilot{% endblock %}
+{% block content %}
+<a class="small" href="{% if meeting %}{% url 'meetings:detail' meeting.id %}{% else %}{% url 'meetings:list' %}{% endif %}">← Annuler</a>
+<h1 class="h2 fw-bold mt-2">{% if meeting %}Modifier le compte rendu{% else %}Créer un compte rendu{% endif %}</h1>
+<form class="bg-white border rounded-4 p-4 mt-4" method="post">
+  {% include "components/form.html" %}
+  <button class="btn btn-primary">Enregistrer</button>
+</form>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{% if task %}Modifier{% else %}Nouvelle tâche{% endif %} · Project Pilot{% endblock %}
+{% block content %}
+<a class="small" href="{% if task %}{% url 'tasks:detail' task.id %}{% else %}{% url 'tasks:list' %}{% endif %}">← Annuler</a>
+<h1 class="h2 fw-bold mt-2">{% if task %}Modifier la tâche{% else %}Créer une tâche{% endif %}</h1>
+<form class="bg-white border rounded-4 p-4 mt-4" method="post">
+  {% include "components/form.html" %}
+  <button class="btn btn-primary" type="submit">Enregistrer</button>
+</form>
+{% endblock %}

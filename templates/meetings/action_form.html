@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Action de réunion · Project Pilot{% endblock %}
+{% block content %}
+<a class="small" href="{% url 'meetings:detail' meeting.id %}">← {{ meeting.title }}</a>
+<h1 class="h2 fw-bold mt-2">{% if action %}Modifier{% else %}Ajouter{% endif %} une action</h1>
+<form class="bg-white border rounded-4 p-4 mt-4" method="post">
+  {% include "components/form.html" %}
+  <button class="btn btn-primary">Enregistrer</button>
+</form>
+{% endblock %}
