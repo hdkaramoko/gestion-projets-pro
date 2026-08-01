@@ -35,5 +35,21 @@ uv run ruff check .
 uv run ruff format .
 ```
 
-SQLite est utilisé pour le MVP. Les paramètres sont séparés par environnement
-afin de préparer un futur passage à PostgreSQL et un déploiement conteneurisé.
+SQLite reste la base utilisée par défaut en local. Pour utiliser PostgreSQL sur
+le SSP Cloud, définir `DB_ENGINE=postgresql` et renseigner toutes les variables
+`POSTGRES_*` documentées dans `.env.example`.
+
+## Déploiement SSP Cloud
+
+Les migrations et la collecte des fichiers statiques sont des étapes explicites,
+séparées du démarrage Gunicorn :
+
+```bash
+uv run python manage.py migrate --noinput
+uv run python manage.py collectstatic --noinput
+uv run gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120
+```
+
+Dans Kubernetes, la migration peut être exécutée dans un Job ou ponctuellement
+dans le pod applicatif avant le déploiement. Aucun secret n'est intégré à
+l'image Docker.
