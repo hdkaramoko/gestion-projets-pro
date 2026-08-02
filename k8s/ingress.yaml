@@ -19,4 +19,4 @@ spec:
                   number: 8000
   tls:
     - hosts:
-        - gestion-projets-pro
+        - gestion-projets-pro.lab.sspcloud.fr

@@ -27,7 +27,13 @@ spec:
 
             - name: DB_ENGINE
               value: postgresql
-              
+
+            - name: HOME
+              value: /tmp
+
+            - name: XDG_CACHE_HOME
+              value: /tmp/.cache
+
             - name: UV_CACHE_DIR
               value: /tmp/uv-cache
 
