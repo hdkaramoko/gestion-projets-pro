@@ -27,6 +27,9 @@ spec:
 
             - name: DB_ENGINE
               value: postgresql
+              
+            - name: UV_CACHE_DIR
+              value: /tmp/uv-cache
 
           envFrom:
             - secretRef:

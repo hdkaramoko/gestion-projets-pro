@@ -17,4 +17,4 @@ RUN uv run python manage.py collectstatic --noinput
 USER 1000:1000
 EXPOSE 8000
 
-CMD ["uv", "run", "gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120"]
+CMD ["/app/.venv/bin/gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120"]
