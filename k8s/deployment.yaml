@@ -72,6 +72,9 @@ spec:
             httpGet:
               path: /
               port: 8000
+              httpHeaders:
+                - name: Host
+                  value: gestion-projet-pro
             initialDelaySeconds: 10
             periodSeconds: 10
 
@@ -79,5 +82,8 @@ spec:
             httpGet:
               path: /
               port: 8000
+              httpHeaders:
+                - name: Host
+                  value: gestion-projet-pro
             initialDelaySeconds: 30
             periodSeconds: 20
