@@ -12,6 +12,25 @@ spec:
       labels:
         app: gestion-projet-pro
     spec:
+      initContainers:
+        - name: migrate
+          image: ghcr.io/hdkaramoko/gestion-projet-pro:0.1.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - /app/.venv/bin/python
+            - manage.py
+            - migrate
+            - --noinput
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: config.settings.production
+
+            - name: DB_ENGINE
+              value: postgresql
+
+          envFrom:
+            - secretRef:
+                name: gestion-projet-secrets
 
       containers:
         - name: gestion-projet-pro

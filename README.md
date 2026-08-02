@@ -50,6 +50,6 @@ uv run python manage.py collectstatic --noinput
 uv run gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120
 ```
 
-Dans Kubernetes, la migration peut être exécutée dans un Job ou ponctuellement
-dans le pod applicatif avant le déploiement. Aucun secret n'est intégré à
-l'image Docker.
+Dans Kubernetes, un conteneur d'initialisation exécute les migrations avant le
+démarrage de l'application. Si une migration échoue, le pod applicatif ne
+démarre pas. Aucun secret n'est intégré à l'image Docker.
