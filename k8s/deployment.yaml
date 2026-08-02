@@ -69,21 +69,17 @@ spec:
               memory: 1Gi
 
           readinessProbe:
-            httpGet:
-              path: /health/
+            tcpSocket:
               port: 8000
-              httpHeaders:
-                - name: Host
-                  value: gestion-projet-pro
             initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 6
 
           livenessProbe:
-            httpGet:
-              path: /health/
+            tcpSocket:
               port: 8000
-              httpHeaders:
-                - name: Host
-                  value: gestion-projet-pro
             initialDelaySeconds: 30
             periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
